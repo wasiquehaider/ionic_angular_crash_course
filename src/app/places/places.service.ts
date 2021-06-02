@@ -11,14 +11,18 @@ export class PlacesService {
       'Times Square',
       'In the heart of Newtork City',
       'https://i.natgeofe.com/k/5b396b5e-59e7-43a6-9448-708125549aa1/new-york-statue-of-liberty.jpg?w=636&h=358',
-      149.99
+      149.99,
+      new Date('2019-01-01'),
+      new Date('2019-12-31 ')
     ),
     new Place(
       'p2',
       'Eiffel Tower',
       'A place in Paris',
       'https://i.natgeofe.com/k/6d4021bf-832e-49f6-b898-27b7fcd7cbf7/eiffel-tower-ground-up_16x9.jpg?w=636&h=358',
-      130.99
+      130.99,
+      new Date('2019-02-01'),
+      new Date('2019-12-31 ')
     ),
   ];
 
