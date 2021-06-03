@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  OnDestroy,
   OnInit,
   Renderer2,
   ViewChild,
@@ -14,9 +15,10 @@ import { environment } from 'src/environments/environment';
   templateUrl: './map-modal.component.html',
   styleUrls: ['./map-modal.component.scss'],
 })
-export class MapModalComponent implements OnInit, AfterViewInit {
+export class MapModalComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('map') mapElementRef: ElementRef;
-
+  clickListener: any;
+  googleMaps: any;
   constructor(
     private modalCtrl: ModalController,
     private renderer: Renderer2
@@ -27,6 +29,7 @@ export class MapModalComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.getGoogleMaps()
       .then((googleMaps) => {
+        this.googleMaps = googleMaps;
         const mapEl = this.mapElementRef.nativeElement;
         const map = new googleMaps.Map(mapEl, {
           center: { lat: -34.397, lng: 150.644 },
@@ -74,5 +77,10 @@ export class MapModalComponent implements OnInit, AfterViewInit {
         }
       };
     });
+  }
+  ngOnDestroy() {
+    if (this.clickListener) {
+      this.googleMaps.event.removeListener(this.clickListener);
+    }
   }
 }
