@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { take, map } from 'rxjs/operators';
-import { AuthService } from '../auth/auth.service';
+import { take, map, tap, delay } from 'rxjs/operators';
+
 import { Place } from './place.model';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,32 +12,43 @@ export class PlacesService {
   private _places = new BehaviorSubject<Place[]>([
     new Place(
       'p1',
-      'Times Square',
-      'In the heart of Newtork City',
-      'https://i.natgeofe.com/k/5b396b5e-59e7-43a6-9448-708125549aa1/new-york-statue-of-liberty.jpg?w=636&h=358',
+      'Manhattan Mansion',
+      'In the heart of New York City.',
+      'https://lonelyplanetimages.imgix.net/mastheads/GettyImages-538096543_medium.jpg?sharp=10&vib=20&w=1200',
       149.99,
       new Date('2019-01-01'),
-      new Date('2019-12-31 '),
-      'user1'
+      new Date('2019-12-31'),
+      'abc'
     ),
     new Place(
       'p2',
-      'Eiffel Tower',
-      'A place in Paris',
-      'https://i.natgeofe.com/k/6d4021bf-832e-49f6-b898-27b7fcd7cbf7/eiffel-tower-ground-up_16x9.jpg?w=636&h=358',
-      130.99,
-      new Date('2019-02-01'),
-      new Date('2019-12-31 '),
-      'user2'
+      "L'Amour Toujours",
+      'A romantic place in Paris!',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Paris_Night.jpg/1024px-Paris_Night.jpg',
+      189.99,
+      new Date('2019-01-01'),
+      new Date('2019-12-31'),
+      'abc'
+    ),
+    new Place(
+      'p3',
+      'The Foggy Palace',
+      'Not your average city trip!',
+      'https://upload.wikimedia.org/wikipedia/commons/0/01/San_Francisco_with_two_bridges_and_the_fog.jpg',
+      99.99,
+      new Date('2019-01-01'),
+      new Date('2019-12-31'),
+      'abc'
     ),
   ]);
 
   get places() {
     return this._places.asObservable();
   }
+
   constructor(private authService: AuthService) {}
 
-  getPlace(id) {
+  getPlace(id: string) {
     return this.places.pipe(
       take(1),
       map((places) => {
@@ -56,16 +68,41 @@ export class PlacesService {
       Math.random().toString(),
       title,
       description,
-      'https://i.natgeofe.com/k/5b396b5e-59e7-43a6-9448-708125549aa1/new-york-statue-of-liberty.jpg?w=636&h=358',
+      'https://lonelyplanetimages.imgix.net/mastheads/GettyImages-538096543_medium.jpg?sharp=10&vib=20&w=1200',
       price,
       dateFrom,
       dateTo,
       this.authService.userId
     );
-    this.places.pipe(take(1)).subscribe((places) => {
-      this._places.next(places.concat(newPlace));
-    });
+    return this.places.pipe(
+      take(1),
+      delay(1000),
+      tap((places) => {
+        this._places.next(places.concat(newPlace));
+      })
+    );
+  }
 
-    console.log('updated places', this._places);
+  updatePlace(placeId: string, title: string, description: string) {
+    return this.places.pipe(
+      take(1),
+      delay(1000),
+      tap((places) => {
+        const updatedPlaceIndex = places.findIndex((pl) => pl.id === placeId);
+        const updatedPlaces = [...places];
+        const oldPlace = updatedPlaces[updatedPlaceIndex];
+        updatedPlaces[updatedPlaceIndex] = new Place(
+          oldPlace.id,
+          title,
+          description,
+          oldPlace.imageUrl,
+          oldPlace.price,
+          oldPlace.availableFrom,
+          oldPlace.availableTo,
+          oldPlace.userId
+        );
+        this._places.next(updatedPlaces);
+      })
+    );
   }
 }
